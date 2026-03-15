@@ -19,11 +19,29 @@ const dutySlider = document.getElementById("dutySlider");
 const ledDutyReadout = document.getElementById("ledDutyReadout");
 const avgVoltageReadout = document.getElementById("avgVoltageReadout");
 const opticalReadout = document.getElementById("opticalReadout");
+const mcuSimButton = document.getElementById("mcuSimButton");
+const counterValue = document.getElementById("counterValue");
+const compareValue = document.getElementById("compareValue");
+const outputState = document.getElementById("outputState");
+const counterFill = document.getElementById("counterFill");
+const compareMarker = document.getElementById("compareMarker");
+const wavePulse = document.getElementById("wavePulse");
+const timerBlock = document.getElementById("timerBlock");
+const compareBlock = document.getElementById("compareBlock");
+const outputBlock = document.getElementById("outputBlock");
+const signalDotA = document.getElementById("signalDotA");
+const signalDotB = document.getElementById("signalDotB");
 
 let currentSlide = 0;
 let currentPanel = 0;
 let wheelLock = false;
 let pulseTimer;
+let mcuTimer;
+let mcuRunning = false;
+let simulatedCount = 0;
+
+const simulatedArr = 999;
+const simulatedCcr = 250;
 
 function renderDots() {
   slides.forEach((slide, index) => {
@@ -110,6 +128,10 @@ function goToSlide(index) {
     return;
   }
 
+  if (slides[currentSlide]?.dataset.title === "MCU PWM Hardware" && mcuRunning) {
+    stopMcuSimulation();
+  }
+
   playPulseTransition();
   currentSlide = next;
   updateSlideState();
@@ -194,6 +216,92 @@ function activeSlideHasPanels() {
   return slides[currentSlide]?.classList.contains("has-panels");
 }
 
+function setModuleState(activeModule) {
+  [timerBlock, compareBlock, outputBlock].forEach((node) => {
+    node?.classList.toggle("active", node === activeModule);
+  });
+}
+
+function stopMcuSimulation() {
+  window.clearInterval(mcuTimer);
+  mcuRunning = false;
+  simulatedCount = 0;
+  if (mcuSimButton) {
+    mcuSimButton.textContent = "Start PWM";
+  }
+  if (counterValue) {
+    counterValue.textContent = "000";
+  }
+  if (compareValue) {
+    compareValue.textContent = String(simulatedCcr);
+  }
+  if (outputState) {
+    outputState.textContent = "LOW";
+  }
+  if (counterFill) {
+    counterFill.style.width = "0%";
+  }
+  if (compareMarker) {
+    compareMarker.style.left = `${(simulatedCcr / (simulatedArr + 1)) * 100}%`;
+  }
+  wavePulse?.classList.remove("running");
+  [signalDotA, signalDotB].forEach((node) => node?.classList.remove("running"));
+  setModuleState(null);
+}
+
+function stepMcuSimulation() {
+  simulatedCount = (simulatedCount + 23) % (simulatedArr + 1);
+  const dutyFraction = simulatedCount / (simulatedArr + 1);
+  const isHigh = simulatedCount < simulatedCcr;
+
+  if (counterValue) {
+    counterValue.textContent = String(simulatedCount).padStart(3, "0");
+  }
+  if (compareValue) {
+    compareValue.textContent = String(simulatedCcr);
+  }
+  if (outputState) {
+    outputState.textContent = isHigh ? "HIGH" : "LOW";
+  }
+  if (counterFill) {
+    counterFill.style.width = `${dutyFraction * 100}%`;
+  }
+  if (wavePulse) {
+    wavePulse.style.backgroundImage = isHigh
+      ? "linear-gradient(90deg, var(--accent) 0 25%, transparent 25% 100%)"
+      : "linear-gradient(90deg, var(--accent-2) 0 8%, transparent 8% 100%)";
+  }
+
+  if (simulatedCount < simulatedCcr * 0.55) {
+    setModuleState(timerBlock);
+  } else if (simulatedCount < simulatedCcr) {
+    setModuleState(compareBlock);
+  } else {
+    setModuleState(outputBlock);
+  }
+}
+
+function toggleMcuSimulation() {
+  if (!mcuSimButton) {
+    return;
+  }
+
+  if (mcuRunning) {
+    stopMcuSimulation();
+    return;
+  }
+
+  mcuRunning = true;
+  mcuSimButton.textContent = "Stop PWM";
+  wavePulse?.classList.add("running");
+  [signalDotA, signalDotB].forEach((node) => node?.classList.add("running"));
+  if (compareMarker) {
+    compareMarker.style.left = `${(simulatedCcr / (simulatedArr + 1)) * 100}%`;
+  }
+  stepMcuSimulation();
+  mcuTimer = window.setInterval(stepMcuSimulation, 120);
+}
+
 document.addEventListener("keydown", (event) => {
   if (!overview.classList.contains("hidden") && event.key !== "Escape") {
     return;
@@ -270,6 +378,7 @@ closeOverview?.addEventListener("click", () => toggleOverview(false));
 dutySlider?.addEventListener("input", (event) => {
   updateLedDemo(event.target.value);
 });
+mcuSimButton?.addEventListener("click", toggleMcuSimulation);
 
 jumpButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -285,3 +394,4 @@ renderPanelDots();
 updateSlideState();
 updatePanelState();
 updateLedDemo(dutySlider?.value ?? 55);
+stopMcuSimulation();

@@ -496,22 +496,72 @@
           </div>
 
           <div class="mcu-stage reveal">
-            <div class="mcu-visual">
-              <div class="mcu-chip">
-                <div class="mcu-layer timer-block">
-                  <span class="chip">Timer Core</span>
-                  <strong>Prescaler -> Counter -> Auto Reload</strong>
+            <div class="mcu-visual interactive-mcu">
+              <div class="mcu-board">
+                <div class="board-plane"></div>
+                <div class="trace trace-a"></div>
+                <div class="trace trace-b"></div>
+                <div class="trace trace-c"></div>
+
+                <div class="mcu-chip isometric-chip">
+                  <div class="chip-top"></div>
+                  <div class="chip-side chip-side-left"></div>
+                  <div class="chip-side chip-side-right"></div>
+                  <div class="chip-label">MCU TIMER BLOCK</div>
+
+                  <div class="mcu-module timer-block" id="timerBlock">
+                    <span class="chip">Timer Core</span>
+                    <strong>PSC -> CNT -> ARR</strong>
+                    <small>Clock division and counter progression</small>
+                  </div>
+                  <div class="mcu-module compare-block" id="compareBlock">
+                    <span class="chip">Comparator</span>
+                    <strong>Compare CNT with CCR1</strong>
+                    <small>Generates match event inside hardware</small>
+                  </div>
+                  <div class="mcu-module output-block" id="outputBlock">
+                    <span class="chip">Output Unit</span>
+                    <strong>PWM mode + channel driver</strong>
+                    <small>Updates pin state without CPU bit-banging</small>
+                  </div>
+                  <div class="signal-dot signal-dot-a" id="signalDotA"></div>
+                  <div class="signal-dot signal-dot-b" id="signalDotB"></div>
                 </div>
-                <div class="mcu-layer compare-block">
-                  <span class="chip">Compare Unit</span>
-                  <strong>Counter compared with CCRx</strong>
+
+                <div class="board-wave-panel">
+                  <div class="simulation-head">
+                    <div>
+                      <span class="chip">Live Simulation</span>
+                      <strong>Counter, compare, and output state</strong>
+                    </div>
+                    <button id="mcuSimButton" class="primary-button" type="button">Start PWM</button>
+                  </div>
+
+                  <div class="counter-visual">
+                    <div class="counter-readout">
+                      <span>CNT</span>
+                      <strong id="counterValue">000</strong>
+                    </div>
+                    <div class="counter-readout">
+                      <span>CCR1</span>
+                      <strong id="compareValue">250</strong>
+                    </div>
+                    <div class="counter-readout">
+                      <span>OUT</span>
+                      <strong id="outputState">LOW</strong>
+                    </div>
+                  </div>
+
+                  <div class="counter-bar">
+                    <div id="counterFill" class="counter-fill"></div>
+                    <div id="compareMarker" class="compare-marker"></div>
+                  </div>
+
+                  <div class="waveform-monitor">
+                    <div class="monitor-grid"></div>
+                    <div id="wavePulse" class="wave-pulse"></div>
+                  </div>
                 </div>
-                <div class="mcu-layer output-block">
-                  <span class="chip">Output Logic</span>
-                  <strong>PWM mode -> output pin driver</strong>
-                </div>
-                <div class="mcu-beam beam-a"></div>
-                <div class="mcu-beam beam-b"></div>
               </div>
 
               <div class="register-rack">
