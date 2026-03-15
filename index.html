@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWM Interactive Presentation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">PWM</span>
+      <span class="brand-copy">Interactive Engineering Deck</span>
+    </div>
+    <div class="status">
+      <span id="sectionLabel">01 / Landing</span>
+      <button id="overviewButton" class="ghost-button" type="button">Overview</button>
+    </div>
+  </header>
+
+  <main class="deck-shell">
+    <aside class="rail">
+      <div class="rail-progress">
+        <span id="progressFill"></span>
+      </div>
+      <nav id="dotNav" class="dot-nav" aria-label="Section navigation"></nav>
+    </aside>
+
+    <section id="deck" class="deck" aria-live="polite">
+      <article class="slide active" data-title="Landing">
+        <div class="slide-grid hero-layout">
+          <div class="hero-copy reveal">
+            <p class="eyebrow">Pulse Width Modulation</p>
+            <h1>From binary switching to analog-like control.</h1>
+            <p class="lede">
+              An interactive technical deck on pulse width modulation with animated waveforms,
+              layered sections, design tradeoffs, and application-driven engineering context.
+            </p>
+            <div class="hero-actions">
+              <button class="primary-button" type="button" data-jump="1">Enter deck</button>
+              <button class="ghost-button" type="button" data-jump="4">Waveform section</button>
+            </div>
+            <ul class="hero-points">
+              <li>Duty cycle controls average output power.</li>
+              <li>Frequency selection changes ripple, losses, and noise.</li>
+              <li>PWM sits behind motor drives, LED dimming, converters, and digital control loops.</li>
+            </ul>
+          </div>
+
+          <div class="hero-visual reveal">
+            <div class="signal-card">
+              <div class="signal-meta">
+                <span>Digital control</span>
+                <span>Real-time switching</span>
+              </div>
+              <div class="signal-scope">
+                <div class="scope-grid"></div>
+                <svg viewBox="0 0 600 220" class="scope-wave">
+                  <path d="M0 160 L0 40 L75 40 L75 160 L150 160 L150 40 L225 40 L225 160 L300 160 L300 40 L375 40 L375 160 L450 160 L450 40 L525 40 L525 160 L600 160" />
+                </svg>
+              </div>
+              <div class="hero-metrics">
+                <div>
+                  <strong>40 kHz</strong>
+                  <span>Switching frequency</span>
+                </div>
+                <div>
+                  <strong>62%</strong>
+                  <span>Duty cycle</span>
+                </div>
+                <div>
+                  <strong>7.44 V</strong>
+                  <span>Avg. from 12 V source</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Core Idea">
+        <div class="slide-grid">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 1</p>
+            <h2>PWM compresses analog intent into timed digital pulses.</h2>
+            <p>
+              Continuous analog control can be approximated by rapidly alternating between full ON and full OFF states.
+              The load responds primarily to the average energy delivered over each switching period.
+            </p>
+          </div>
+
+          <div class="panel-stack reveal">
+            <div class="info-panel">
+              <h3>Key equation</h3>
+              <p><code>Vavg ≈ Duty Cycle × Vsupply</code> for resistive or filtered loads.</p>
+            </div>
+            <div class="info-panel">
+              <h3>Why engineers use it</h3>
+              <p>Switching devices operate efficiently near the ON and OFF extremes, so power loss is often lower than in linear control.</p>
+            </div>
+            <div class="info-panel">
+              <h3>What changes system behavior</h3>
+              <p>Load type, switching frequency, dead time, rise/fall time, filtering, and control-loop bandwidth.</p>
+            </div>
+          </div>
+
+          <div class="formula-band reveal">
+            <div class="formula-card">
+              <span class="formula-label">Duty Cycle</span>
+              <strong>D = Ton / T</strong>
+              <p>Fraction of each period spent in the ON state.</p>
+            </div>
+            <div class="formula-card accent">
+              <span class="formula-label">Period</span>
+              <strong>f = 1 / T</strong>
+              <p>Higher frequency can reduce ripple, but increases switching stress.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Mathematics">
+        <div class="slide-grid split-grid math-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 2</p>
+            <h2>Mathematical model: average value comes from time weighting.</h2>
+            <p>
+              For a periodic signal that remains at <code>Vs</code> during <code>Ton</code> and at 0 V during
+              <code>Toff</code>, the average output over one period follows directly from time-domain integration.
+            </p>
+          </div>
+
+          <div class="derivation-card reveal">
+            <div class="derivation-step">
+              <span>01</span>
+              <p><code>T = Ton + Toff</code></p>
+            </div>
+            <div class="derivation-step">
+              <span>02</span>
+              <p><code>Vavg = (1 / T) ∫0T v(t) dt</code></p>
+            </div>
+            <div class="derivation-step">
+              <span>03</span>
+              <p><code>Vavg = (1 / T) [(Vs)(Ton) + (0)(Toff)]</code></p>
+            </div>
+            <div class="derivation-step accent">
+              <span>04</span>
+              <p><code>Vavg = Vs × (Ton / T) = Vs × D</code></p>
+            </div>
+          </div>
+
+          <div class="formula-band reveal">
+            <div class="formula-card">
+              <span class="formula-label">Example</span>
+              <strong>12 V × 0.25 = 3 V</strong>
+              <p>At 25% duty cycle, the average delivered voltage is 3 V for a filtered or averaging load.</p>
+            </div>
+            <div class="formula-card accent">
+              <span class="formula-label">Engineering note</span>
+              <strong>Average is not instant</strong>
+              <p>The waveform remains discontinuous. Smooth system behavior appears only when the load averages or filters the switching signal.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Proof Idea">
+        <div class="slide-grid theorem-layout">
+          <div class="theorem-card reveal">
+            <p class="eyebrow">Section 3</p>
+            <h2>Proposition</h2>
+            <p class="theorem-statement">
+              For an ideal PWM waveform applied to a linear low-pass or energy-averaging load, the low-frequency output component is proportional to duty cycle.
+            </p>
+          </div>
+
+          <div class="proof-card reveal">
+            <h3>Proof sketch</h3>
+            <ol class="proof-list">
+              <li>Represent the input over one switching period as a rectangular periodic waveform.</li>
+              <li>The DC term of that waveform equals its average over one period.</li>
+              <li>That average is <code>Vs × D</code>, from the time-domain integral.</li>
+              <li>A low-pass filter or an inductive-mechanical load suppresses high-frequency switching harmonics.</li>
+              <li>The dominant observed output therefore tracks the DC term, which is proportional to duty cycle.</li>
+            </ol>
+            <p class="proof-note">
+              The result provides engineering rigor suitable for presentations in embedded systems, control theory, and power electronics.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide has-panels" data-title="Waveform Lab">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Section 4</p>
+          <h2>Waveform lab with horizontal sub-slides.</h2>
+          <p>Horizontal sub-slides compare representative duty-cycle conditions and their resulting engineering implications.</p>
+        </div>
+
+        <div class="panel-viewer">
+          <div class="panel-track" data-panel-track>
+            <section class="panel active" data-panel-title="10% Duty">
+              <div class="panel-content">
+                <div>
+                  <span class="chip">Panel A</span>
+                  <h3>Low duty cycle: low average energy</h3>
+                  <p>
+                    A narrow ON interval delivers short bursts of energy separated by longer OFF intervals.
+                    This condition is associated with low LED brightness or light motor torque demand.
+                  </p>
+                  <ul class="detail-list">
+                    <li>Average output from 12 V source is about 1.2 V.</li>
+                    <li>Ripple becomes more visible if frequency is too low.</li>
+                    <li>Perceptible flicker is likely in visual systems at poor frequency choices.</li>
+                  </ul>
+                </div>
+                <div class="wave-card">
+                  <div class="wave-display wave-10"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel" data-panel-title="50% Duty">
+              <div class="panel-content">
+                <div>
+                  <span class="chip">Panel B</span>
+                  <h3>Balanced waveform: classic demonstration case</h3>
+                  <p>
+                    At 50%, the ON and OFF intervals are equal. This case is commonly used to illustrate timer behavior,
+                    waveform symmetry, and midpoint average power delivery.
+                  </p>
+                  <ul class="detail-list">
+                    <li>Average output is about 6 V from a 12 V source.</li>
+                    <li>Symmetric timing simplifies explanation, not always system optimization.</li>
+                    <li>Current ripple still depends on load inductance and filter design.</li>
+                  </ul>
+                </div>
+                <div class="wave-card">
+                  <div class="wave-display wave-50"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel" data-panel-title="90% Duty">
+              <div class="panel-content">
+                <div>
+                  <span class="chip">Panel C</span>
+                  <h3>High duty cycle: near-full delivery</h3>
+                  <p>
+                    The waveform remains ON for most of the switching period, with only short OFF intervals.
+                    Loads with inertia or filtering may therefore respond as if driven by a nearly steady high level.
+                  </p>
+                  <ul class="detail-list">
+                    <li>Average output is about 10.8 V from a 12 V source.</li>
+                    <li>Thermal and switching limits still matter even if average output is high.</li>
+                    <li>Control resolution near rail conditions becomes important.</li>
+                  </ul>
+                </div>
+                <div class="wave-card">
+                  <div class="wave-display wave-90"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="panel-controls">
+            <button id="panelPrev" class="ghost-button" type="button">Previous panel</button>
+            <div id="panelDots" class="panel-dots" aria-label="Sub-slide navigation"></div>
+            <button id="panelNext" class="ghost-button" type="button">Next panel</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="LED Dimming">
+        <div class="slide-grid led-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 5</p>
+            <h2>LED dimming: the whole page becomes the load.</h2>
+            <p>
+              The page brightness varies with duty cycle to illustrate LED dimming through PWM.
+              Average delivered power changes continuously even though the switch still operates only in ON and OFF states.
+            </p>
+          </div>
+
+          <div class="led-console reveal">
+            <div class="led-scene" id="ledScene">
+              <div class="led-bulb"></div>
+              <div class="led-glow"></div>
+              <div class="led-caption">
+                <strong id="ledDutyReadout">55%</strong>
+                <span>Duty cycle</span>
+              </div>
+            </div>
+
+            <div class="led-controls">
+              <label for="dutySlider">Duty cycle control</label>
+              <input id="dutySlider" type="range" min="5" max="100" value="55" step="1">
+              <div class="led-metrics">
+                <div>
+                  <strong id="avgVoltageReadout">6.60 V</strong>
+                  <span>Average from 12 V</span>
+                </div>
+                <div>
+                  <strong id="opticalReadout">Medium-high</strong>
+                  <span>Perceived brightness</span>
+                </div>
+              </div>
+              <p class="led-note">
+                The same example supports introductory intuition, timer-level implementation discussion,
+                and higher-level analysis of flicker, current limiting, thermal behavior, and perceptual nonlinearity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="LED On-Off Logic">
+        <div class="slide-grid led-logic-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 6</p>
+            <h2>LED behavior remains binary even when brightness appears continuous.</h2>
+            <p>
+              Based on the referenced PWM explainer video, the LED should be understood as a device that is either fully ON or fully OFF at each instant.
+              Intermediate brightness appears only because the ON time changes within each period.
+            </p>
+          </div>
+
+          <div class="led-logic-board reveal">
+            <div class="logic-card">
+              <span class="chip">State A</span>
+              <h3>0% duty cycle</h3>
+              <div class="logic-led logic-off"></div>
+              <div class="logic-wave wave-off"></div>
+              <p>The LED receives no ON interval during the period, so it remains OFF for the entire cycle.</p>
+            </div>
+
+            <div class="logic-card">
+              <span class="chip">State B</span>
+              <h3>50% duty cycle</h3>
+              <div class="logic-led logic-mid"></div>
+              <div class="logic-wave wave-mid"></div>
+              <p>The LED alternates between full ON and full OFF. The eye integrates the rapid switching and perceives a medium brightness level.</p>
+            </div>
+
+            <div class="logic-card">
+              <span class="chip">State C</span>
+              <h3>100% duty cycle</h3>
+              <div class="logic-led logic-on"></div>
+              <div class="logic-wave wave-on"></div>
+              <p>The LED remains ON for the complete period, producing maximum average optical output.</p>
+            </div>
+          </div>
+
+          <div class="logic-note reveal">
+            <strong>Key observation</strong>
+            <p>
+              The video-linked explanation emphasizes outcomes of different duty cycles rather than intermediate analog voltage levels at the LED itself.
+              The waveform changes in width, while the LED switching state stays binary.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Applications">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Section 7</p>
+          <h2>Where PWM becomes system-critical.</h2>
+        </div>
+
+        <div class="application-grid">
+          <div class="app-card reveal">
+            <div class="app-visual motor-visual">
+              <div class="motor-body"></div>
+              <div class="motor-rotor"></div>
+              <div class="motor-shaft"></div>
+            </div>
+            <span class="app-index">01</span>
+            <h3>Motor control</h3>
+            <p>Duty cycle regulates average armature voltage, enabling speed and torque control in DC drives, BLDC stages, and H-bridge systems.</p>
+          </div>
+          <div class="app-card reveal">
+            <div class="app-visual smps-visual">
+              <div class="smps-node source"></div>
+              <div class="smps-switch"></div>
+              <div class="smps-inductor"></div>
+              <div class="smps-capacitor"></div>
+              <div class="smps-load"></div>
+              <div class="energy-pulse"></div>
+            </div>
+            <span class="app-index">02</span>
+            <h3>Switch-mode power supplies</h3>
+            <p>PWM governs energy transfer in buck, boost, and inverter topologies, directly affecting efficiency, ripple, and electromagnetic behavior.</p>
+          </div>
+          <div class="app-card reveal">
+            <div class="app-visual led-app-visual">
+              <div class="mini-led led-a"></div>
+              <div class="mini-led led-b"></div>
+              <div class="mini-led led-c"></div>
+            </div>
+            <span class="app-index">03</span>
+            <h3>LED dimming</h3>
+            <p>Average optical output changes with duty cycle while instantaneous drive remains digital, preserving efficient switching behavior.</p>
+          </div>
+          <div class="app-card reveal">
+            <div class="app-visual audio-visual">
+              <div class="speaker-box"></div>
+              <div class="speaker-cone"></div>
+              <div class="sound-ring ring-a"></div>
+              <div class="sound-ring ring-b"></div>
+              <div class="sound-ring ring-c"></div>
+            </div>
+            <span class="app-index">04</span>
+            <h3>Audio and actuation interfaces</h3>
+            <p>PWM is used in class-D amplification, buzzers, and compact actuation interfaces where switching signals are filtered or mechanically averaged.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Generation & Use">
+        <div class="slide-grid generation-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 8</p>
+            <h2>PWM generation and utilization in one visual chain.</h2>
+            <p>
+              PWM begins as a timing comparison problem inside a controller and becomes useful only after
+              the switching waveform interacts with a power stage, a filter, and a physical load.
+            </p>
+          </div>
+
+          <div class="generation-board reveal">
+            <div class="generation-flow">
+              <div class="gen-node">
+                <span class="chip">Reference</span>
+                <strong>Speed / brightness / voltage target</strong>
+              </div>
+              <div class="gen-arrow"></div>
+              <div class="gen-node">
+                <span class="chip">Timer + Counter</span>
+                <strong>Periodic ramp or counter base</strong>
+              </div>
+              <div class="gen-arrow"></div>
+              <div class="gen-node">
+                <span class="chip">Compare Logic</span>
+                <strong>High while counter &lt; compare</strong>
+              </div>
+              <div class="gen-arrow"></div>
+              <div class="gen-node">
+                <span class="chip">Power Stage</span>
+                <strong>MOSFET / driver / bridge</strong>
+              </div>
+              <div class="gen-arrow"></div>
+              <div class="gen-node">
+                <span class="chip">Load Response</span>
+                <strong>Motor, LED, converter, audio load</strong>
+              </div>
+            </div>
+
+            <div class="generation-visuals">
+              <div class="gen-card">
+                <h3>Actual generation</h3>
+                <div class="counter-demo">
+                  <div class="counter-track">
+                    <div class="counter-scan"></div>
+                    <div class="compare-level"></div>
+                  </div>
+                </div>
+                <p>The PWM output stays high until the timer count crosses the compare threshold, after which it turns low for the remainder of the period.</p>
+              </div>
+
+              <div class="gen-card">
+                <h3>Actual utilization</h3>
+                <div class="utilization-demo">
+                  <div class="util-wave"></div>
+                  <div class="util-filter"></div>
+                  <div class="util-output"></div>
+                </div>
+                <p>The switching waveform is then converted into usable electrical, optical, mechanical, or acoustic behavior by filtering, inertia, or energy storage.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="MCU PWM Hardware">
+        <div class="slide-grid mcu-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 9</p>
+            <h2>Hardware PWM generation inside an MCU.</h2>
+            <p>
+              In a microcontroller, PWM is typically generated by a timer peripheral whose counter is compared
+              against programmed register values. The output pin changes state automatically when compare events occur.
+            </p>
+          </div>
+
+          <div class="mcu-stage reveal">
+            <div class="mcu-visual">
+              <div class="mcu-chip">
+                <div class="mcu-layer timer-block">
+                  <span class="chip">Timer Core</span>
+                  <strong>Prescaler -> Counter -> Auto Reload</strong>
+                </div>
+                <div class="mcu-layer compare-block">
+                  <span class="chip">Compare Unit</span>
+                  <strong>Counter compared with CCRx</strong>
+                </div>
+                <div class="mcu-layer output-block">
+                  <span class="chip">Output Logic</span>
+                  <strong>PWM mode -> output pin driver</strong>
+                </div>
+                <div class="mcu-beam beam-a"></div>
+                <div class="mcu-beam beam-b"></div>
+              </div>
+
+              <div class="register-rack">
+                <div class="register-card">
+                  <span class="chip">PSC</span>
+                  <strong>Prescaler register</strong>
+                  <p>Divides the base clock before the timer counts.</p>
+                </div>
+                <div class="register-card">
+                  <span class="chip">ARR / TOP</span>
+                  <strong>Period register</strong>
+                  <p>Defines the PWM period or wrap value.</p>
+                </div>
+                <div class="register-card">
+                  <span class="chip">CCR1</span>
+                  <strong>Compare register</strong>
+                  <p>Defines the duty threshold within the period.</p>
+                </div>
+                <div class="register-card">
+                  <span class="chip">CCER / COM bits</span>
+                  <strong>Channel enable + mode</strong>
+                  <p>Enables the pin output and selects PWM polarity/mode.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="register-explain">
+              <div class="register-flow">
+                <div class="register-step">
+                  <strong>1. Clock division</strong>
+                  <p><code>timer_clk = fclk / (PSC + 1)</code></p>
+                </div>
+                <div class="register-step">
+                  <strong>2. Period setup</strong>
+                  <p><code>fpwm = timer_clk / (ARR + 1)</code></p>
+                </div>
+                <div class="register-step">
+                  <strong>3. Duty setup</strong>
+                  <p><code>duty = CCRx / (ARR + 1)</code></p>
+                </div>
+                <div class="register-step accent">
+                  <strong>4. Hardware action</strong>
+                  <p>The channel output stays active while <code>CNT &lt; CCRx</code>, then toggles automatically.</p>
+                </div>
+              </div>
+
+              <div class="register-code">
+                <h3>Register-level implementation pattern</h3>
+                <pre><code>TIMx_PSC  = 79;
+TIMx_ARR  = 999;
+TIMx_CCR1 = 250;
+
+TIMx_CCMR1 |= PWM_MODE_1;
+TIMx_CCER  |= CH1_ENABLE;
+TIMx_CR1   |= TIMER_ENABLE;</code></pre>
+                <p>
+                  This sequence configures the timer clock division, period, compare threshold, PWM mode,
+                  channel enable, and final timer start. Once enabled, the waveform is generated without CPU toggling.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Embedded Systems">
+        <div class="slide-grid embed-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 10</p>
+            <h2>PWM in embedded systems: both hardware and software matter.</h2>
+            <p>
+              A complete embedded-systems view includes both the microcontroller peripherals that generate PWM in hardware
+              and the firmware layers that compute, schedule, and supervise duty-cycle updates.
+            </p>
+          </div>
+
+          <div class="embed-columns reveal">
+            <div class="embed-card">
+              <span class="chip">Hardware use</span>
+              <h3>Timer and peripheral side</h3>
+              <ul class="detail-list">
+                <li>MCU timers generate PWM without continuous CPU intervention.</li>
+                <li>Output compare units define duty cycle with deterministic timing.</li>
+                <li>Complementary PWM and dead time are used in motor drives and power stages.</li>
+                <li>DMA or event systems can feed waveform updates at high rate.</li>
+                <li>Pins route PWM into LEDs, fans, H-bridges, buck converters, and servo outputs.</li>
+              </ul>
+            </div>
+            <div class="embed-card">
+              <span class="chip">Software use</span>
+              <h3>Firmware and control side</h3>
+              <ul class="detail-list">
+                <li>Control loops compute new duty values from sensor feedback.</li>
+                <li>RTOS tasks or ISRs decide when updates are safe and synchronized.</li>
+                <li>Calibration tables linearize nonlinear loads such as LEDs and motors.</li>
+                <li>Fault software clamps PWM during overcurrent, overtemperature, or undervoltage events.</li>
+                <li>Communication stacks expose PWM setpoints for UI, diagnostics, and remote control.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Tradeoffs">
+        <div class="slide-grid split-grid">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 11</p>
+            <h2>Choosing PWM settings is mostly a tradeoff problem.</h2>
+            <p>
+              Practical PWM design is governed by competing constraints rather than by definitions alone.
+            </p>
+          </div>
+
+          <div class="tradeoff-board reveal">
+            <div class="tradeoff-card">
+              <h3>Raise frequency</h3>
+              <p>Smaller filters, smoother output, reduced low-frequency artifacts.</p>
+              <span>Cost: more switching loss and potential EMI stress.</span>
+            </div>
+            <div class="tradeoff-card">
+              <h3>Increase resolution</h3>
+              <p>Finer duty-cycle control, improved low-speed or low-brightness behavior.</p>
+              <span>Cost: timer limits and control-update complexity.</span>
+            </div>
+            <div class="tradeoff-card">
+              <h3>Add filtering</h3>
+              <p>Cleaner analog-like output, less ripple delivered to the load.</p>
+              <span>Cost: slower response, larger components, more design tuning.</span>
+            </div>
+            <div class="tradeoff-card">
+              <h3>Protect the switch</h3>
+              <p>Dead time, gate shaping, and layout discipline reduce shoot-through and ringing.</p>
+              <span>Cost: added implementation detail and timing calibration.</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Design Checklist">
+        <div class="slide-grid checklist-layout">
+          <div class="section-heading reveal">
+            <p class="eyebrow">Section 12</p>
+            <h2>PWM design checklist for a real system review.</h2>
+          </div>
+
+          <div class="checklist reveal">
+            <div class="check-item"><span></span><p>Define the load model: resistive, inductive, capacitive, or mixed.</p></div>
+            <div class="check-item"><span></span><p>Select frequency based on ripple, acoustics, EMC, and switch capability.</p></div>
+            <div class="check-item"><span></span><p>Validate thermal behavior at worst-case duty cycle and ambient condition.</p></div>
+            <div class="check-item"><span></span><p>Quantify timer resolution and control-loop update limits.</p></div>
+            <div class="check-item"><span></span><p>Review layout, current return paths, and gate-drive integrity.</p></div>
+            <div class="check-item"><span></span><p>Measure waveform quality on hardware, not only in simulation.</p></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="slide" data-title="Closing">
+        <div class="closing-card reveal">
+          <p class="eyebrow">Final Frame</p>
+          <h2>PWM is simple in principle and demanding in implementation.</h2>
+          <p>
+            That tension is exactly why it remains one of the most useful control techniques in embedded and power electronics.
+            The subject combines a simple switching concept with nontrivial design decisions in implementation, control, and system integration.
+          </p>
+          <div class="closing-stats">
+            <div>
+              <strong>14</strong>
+              <span>Vertical sections</span>
+            </div>
+            <div>
+              <strong>3</strong>
+              <span>Horizontal sub-slides</span>
+            </div>
+            <div>
+              <strong>100%</strong>
+              <span>Browser-based delivery</span>
+            </div>
+          </div>
+          <button class="primary-button" type="button" data-jump="0">Return to opening</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="overview" class="overview hidden" aria-hidden="true">
+    <div class="overview-card">
+      <div class="overview-head">
+        <h2>Deck Overview</h2>
+        <button id="closeOverview" class="ghost-button" type="button">Close</button>
+      </div>
+      <div id="overviewGrid" class="overview-grid"></div>
+    </div>
+  </div>
+
+  <footer class="hint-bar">
+    <p>Controls: <kbd>↑</kbd> <kbd>↓</kbd> sections, <kbd>←</kbd> <kbd>→</kbd> sub-slides, mouse wheel, or on-screen buttons.</p>
+  </footer>
+
+  <div id="pulseTransition" class="pulse-transition" aria-hidden="true">
+    <div class="pulse-core"></div>
+    <div class="pulse-wave pulse-wave-a"></div>
+    <div class="pulse-wave pulse-wave-b"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
