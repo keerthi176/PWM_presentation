@@ -182,6 +182,17 @@ function toggleOverview(forceState) {
   overview.setAttribute("aria-hidden", String(!shouldShow));
 }
 
+const ledWaveDisplay = document.getElementById("ledWaveDisplay");
+const btnForward = document.getElementById("btnForward");
+const btnReverse = document.getElementById("btnReverse");
+const btnBrake = document.getElementById("btnBrake");
+const hBridgeMotor = document.querySelector(".h-bridge-motor");
+const sw1 = document.querySelector(".sw-1");
+const sw2 = document.querySelector(".sw-2");
+const sw3 = document.querySelector(".sw-3");
+const sw4 = document.querySelector(".sw-4");
+const currentFlow = document.getElementById("currentFlow");
+
 function updateLedDemo(value) {
   const duty = Number(value);
   const avgVoltage = (12 * duty) / 100;
@@ -195,6 +206,10 @@ function updateLedDemo(value) {
 
   if (avgVoltageReadout) {
     avgVoltageReadout.textContent = `${avgVoltage.toFixed(2)} V`;
+  }
+
+  if (ledWaveDisplay) {
+    ledWaveDisplay.style.setProperty("--wave-duty", `${duty}%`);
   }
 
   if (opticalReadout) {
@@ -211,6 +226,49 @@ function updateLedDemo(value) {
     opticalReadout.textContent = label;
   }
 }
+
+let scenarioInterval;
+function clearScenario() {
+  clearInterval(scenarioInterval);
+  [sw1, sw2, sw3, sw4].forEach(sw => sw?.classList.remove("on"));
+  if (hBridgeMotor) hBridgeMotor.style.transform = "rotate(0deg)";
+  if (currentFlow) {
+    currentFlow.classList.remove("active");
+    currentFlow.style.animation = "none";
+  }
+}
+
+btnForward?.addEventListener("click", () => {
+  clearScenario();
+  sw1?.classList.add("on");
+  sw4?.classList.add("on");
+  let angle = 0;
+  scenarioInterval = setInterval(() => {
+    angle += 10;
+    if (hBridgeMotor) hBridgeMotor.style.transform = `rotate(${angle}deg)`;
+  }, 30);
+  if (currentFlow) {
+    currentFlow.classList.add("active");
+    currentFlow.style.animation = "currentForward 2s linear infinite";
+  }
+});
+
+btnReverse?.addEventListener("click", () => {
+  clearScenario();
+  sw2?.classList.add("on");
+  sw3?.classList.add("on");
+  let angle = 0;
+  scenarioInterval = setInterval(() => {
+    angle -= 10;
+    if (hBridgeMotor) hBridgeMotor.style.transform = `rotate(${angle}deg)`;
+  }, 30);
+});
+
+btnBrake?.addEventListener("click", () => {
+  clearScenario();
+  sw3?.classList.add("on");
+  sw4?.classList.add("on");
+});
 
 function activeSlideHasPanels() {
   return slides[currentSlide]?.classList.contains("has-panels");
