@@ -28,22 +28,18 @@ void hal_entry (void)
     uint32_t duty_cycle = 0;
     bool breathing_up = true;
 
-    /* Initialize the GPT timer module */
     err = g_timer0.p_api->open(g_timer0.p_ctrl, g_timer0.p_cfg);
     if (FSP_SUCCESS != err)
     {
-        /* Trap if initialization fails */
         while(1);
     }
 
-    /* Get the timer period to calculate duty cycle increments */
     err = g_timer0.p_api->infoGet(g_timer0.p_ctrl, &info);
     if (FSP_SUCCESS != err)
     {
         while(1);
     }
 
-    /* Start the timer */
     err = g_timer0.p_api->start(g_timer0.p_ctrl);
     if (FSP_SUCCESS != err)
     {
@@ -55,11 +51,9 @@ void hal_entry (void)
 
     while (1)
     {
-        /* Update duty cycle for GTIOCB (pin index 1) */
-        /* P100 on GPT Channel 5 is GTIOCB */
+
         g_timer0.p_api->dutyCycleSet(g_timer0.p_ctrl, duty_cycle, 1);
 
-        /* Breathing logic: fade in then fade out */
         if (breathing_up)
         {
             duty_cycle += step;
@@ -82,7 +76,6 @@ void hal_entry (void)
             }
         }
 
-        /* Delay to control the speed of the breathing effect */
         R_BSP_SoftwareDelay(10, BSP_DELAY_UNITS_MILLISECONDS);
     }
 }
